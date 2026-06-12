@@ -95,3 +95,81 @@ export async function deleteStoredFile(storedName: string): Promise<void> {
     // El archivo ya no existe en disco.
   }
 }
+
+const NEWS_IMAGE_MAX_BYTES = 10 * 1024 * 1024;
+const NEWS_IMAGE_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+]);
+
+export function getNewsStorageDir(): string {
+  return path.join(getStorageDir(), "news");
+}
+
+export async function ensureNewsStorageDir(): Promise<string> {
+  const dir = getNewsStorageDir();
+  await mkdir(dir, { recursive: true });
+  return dir;
+}
+
+export function getNewsImageAbsolutePath(storedName: string): string {
+  const newsDir = getNewsStorageDir();
+  const resolved = path.resolve(newsDir, storedName);
+  const relative = path.relative(newsDir, resolved);
+
+  if (relative.startsWith("..") || path.isAbsolute(relative)) {
+    throw new Error("Ruta de imagen inválida.");
+  }
+
+  return resolved;
+}
+
+export async function newsImageExists(storedName: string): Promise<boolean> {
+  try {
+    await stat(getNewsImageAbsolutePath(storedName));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function createNewsImageReadStream(storedName: string) {
+  return createReadStream(getNewsImageAbsolutePath(storedName));
+}
+
+export async function saveNewsImage(
+  file: File,
+): Promise<{ storedName: string; mimeType: string; sizeBytes: number }> {
+  if (file.size > NEWS_IMAGE_MAX_BYTES) {
+    throw new Error("La imagen supera el límite de 10 MB.");
+  }
+
+  const mimeType = file.type || "application/octet-stream";
+  if (!NEWS_IMAGE_TYPES.has(mimeType)) {
+    throw new Error("Formato de imagen no soportado. Usá JPG, PNG, WebP o GIF.");
+  }
+
+  const newsDir = await ensureNewsStorageDir();
+  const originalName = sanitizeOriginalName(file.name || "imagen.jpg");
+  const storedName = buildStoredName(originalName);
+  const absolutePath = path.join(newsDir, storedName);
+
+  const buffer = Buffer.from(await file.arrayBuffer());
+  await writeFile(absolutePath, buffer);
+
+  return {
+    storedName,
+    mimeType,
+    sizeBytes: file.size,
+  };
+}
+
+export async function deleteNewsImage(storedName: string): Promise<void> {
+  try {
+    await unlink(getNewsImageAbsolutePath(storedName));
+  } catch {
+    // La imagen ya no existe en disco.
+  }
+}

@@ -10,14 +10,23 @@ export default async function DashboardLayout({
 }>) {
   const session = await getSession();
   const pathname = await getRequestPathname();
+  const isWideTableView =
+    /^\/dashboard\/redirects\/[^/]+$/.test(pathname) ||
+    /^\/dashboard\/seetransfer\/[^/]+$/.test(pathname);
 
   return (
-    <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
+    <main
+      className={`mx-auto w-full flex-1 py-8 ${
+        isWideTableView
+          ? "max-w-[min(100vw-1.5rem,1920px)] px-3 sm:px-4"
+          : "max-w-7xl px-4 sm:px-6 lg:px-8"
+      }`}
+    >
       {session && (
         <div className="space-y-6">
           <DashboardHeader
             username={session.username}
-            description="Gestiona redirects de noticias y transferencias de archivos."
+            description="Gestiona redirects, transferencias de archivos y noticias con IA."
           />
           <DashboardTabs initialPathname={pathname} />
         </div>

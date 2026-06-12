@@ -14,6 +14,7 @@ model User {
   updatedAt     DateTime       @updatedAt @map("updated_at")
   redirectLinks RedirectLink[]
   transfers     Transfer[]
+  fakeNewsArticles FakeNewsArticle[]
 
   @@map("users")
 }
@@ -120,4 +121,22 @@ model TransferHit {
   @@index([transferId])
   @@index([createdAt])
   @@map("transfer_hits")
+}
+
+model FakeNewsArticle {
+  id              String   @id @default(cuid())
+  title           String
+  body            String   @db.Text
+  summary         String?  @db.Text
+  changesPrompt   String   @map("changes_prompt") @db.Text
+  originalText    String   @map("original_text") @db.Text
+  imageStoredName String?  @map("image_stored_name")
+  imageMimeType   String?  @map("image_mime_type")
+  userId          String   @map("user_id")
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@map("fake_news_articles")
 }

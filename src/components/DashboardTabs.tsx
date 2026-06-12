@@ -16,6 +16,12 @@ const tabs = [
     label: "Seetransfer",
     match: (path: string) => path.startsWith("/dashboard/seetransfer"),
   },
+  {
+    href: "/dashboard/fake-new",
+    label: "Fake News",
+    beta: true,
+    match: (path: string) => path.startsWith("/dashboard/fake-new"),
+  },
 ];
 
 interface DashboardTabsProps {
@@ -34,13 +40,18 @@ export default function DashboardTabs({ initialPathname }: DashboardTabsProps) {
           <Link
             key={tab.href}
             href={tab.href}
-            className={`relative px-4 py-3 text-sm font-medium transition-colors ${
+            className={`relative flex items-center gap-1.5 px-4 py-3 text-sm font-medium transition-colors ${
               active
                 ? "text-amber-400"
                 : "text-slate-400 hover:text-slate-200"
             }`}
           >
             {tab.label}
+            {"beta" in tab && tab.beta && (
+              <span className="rounded px-1 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-amber-500/20 text-amber-400">
+                beta
+              </span>
+            )}
             {active && (
               <motion.span
                 layoutId="dashboard-tab-indicator"

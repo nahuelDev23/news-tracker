@@ -10,6 +10,9 @@ function formatCoords(lat: number | null, lng: number | null) {
   return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
 }
 
+const thClass = "px-2 py-3 text-left text-xs font-medium text-slate-300 sm:px-3";
+const tdClass = "px-2 py-3 align-top text-sm sm:px-3";
+
 export default function TransferHitsTable({ hits }: TransferHitsTableProps) {
   if (hits.length === 0) {
     return (
@@ -21,66 +24,84 @@ export default function TransferHitsTable({ hits }: TransferHitsTableProps) {
 
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-800">
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-800 text-sm">
-          <thead className="bg-slate-900/80">
-            <tr>
-              <th className="px-4 py-3 text-left font-medium text-slate-300">Fecha</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-300">IP pública</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-300">IP local</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-300">Lat / Lng</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-300">Geo</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-300">Dispositivo</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-300">Navegador</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-300">Pantalla</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-300">Idioma</th>
-              <th className="px-4 py-3 text-left font-medium text-slate-300">Referer</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-800 bg-slate-950/40">
-            {hits.map((hit) => (
-              <tr key={hit.id} className="align-top hover:bg-slate-900/50">
-                <td className="px-4 py-3 whitespace-nowrap text-slate-400">
-                  {formatHitDate(hit.createdAt)}
-                </td>
-                <td className="px-4 py-3 font-mono text-slate-200">
-                  {hit.ipAddress ?? "—"}
-                </td>
-                <td className="px-4 py-3 font-mono text-slate-400">
-                  {hit.internalIp ?? "—"}
-                </td>
-                <td className="px-4 py-3 font-mono text-slate-200">
-                  {formatCoords(hit.latitude, hit.longitude)}
-                </td>
-                <td className="px-4 py-3 text-slate-300">
-                  <div>{hit.city ?? "—"}</div>
-                  <div className="text-xs text-slate-500">
-                    {[hit.region, hit.country].filter(Boolean).join(", ") || "—"}
+      <table className="w-full table-fixed divide-y divide-slate-800 text-sm">
+        <colgroup>
+          <col className="w-[12%]" />
+          <col className="w-[10%]" />
+          <col className="w-[10%]" />
+          <col className="w-[10%]" />
+          <col className="w-[12%]" />
+          <col className="w-[9%]" />
+          <col className="w-[14%]" />
+          <col className="w-[7%]" />
+          <col className="w-[8%]" />
+          <col className="w-[8%]" />
+        </colgroup>
+        <thead className="bg-slate-900/80">
+          <tr>
+            <th className={thClass}>Fecha</th>
+            <th className={thClass}>IP pública</th>
+            <th className={thClass}>IP local</th>
+            <th className={thClass}>Lat / Lng</th>
+            <th className={thClass}>Geo</th>
+            <th className={thClass}>Dispositivo</th>
+            <th className={thClass}>Navegador</th>
+            <th className={thClass}>Pantalla</th>
+            <th className={thClass}>Idioma</th>
+            <th className={thClass}>Referer</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-800 bg-slate-950/40">
+          {hits.map((hit) => (
+            <tr key={hit.id} className="hover:bg-slate-900/50">
+              <td className={`${tdClass} whitespace-nowrap text-slate-400`}>
+                {formatHitDate(hit.createdAt)}
+              </td>
+              <td className={`${tdClass} truncate font-mono text-slate-200`} title={hit.ipAddress ?? undefined}>
+                {hit.ipAddress ?? "—"}
+              </td>
+              <td className={`${tdClass} truncate font-mono text-slate-400`} title={hit.internalIp ?? undefined}>
+                {hit.internalIp ?? "—"}
+              </td>
+              <td className={`${tdClass} font-mono text-xs text-slate-200`}>
+                {formatCoords(hit.latitude, hit.longitude)}
+              </td>
+              <td className={`${tdClass} text-slate-300`}>
+                <div className="truncate">{hit.city ?? "—"}</div>
+                <div className="truncate text-xs text-slate-500">
+                  {[hit.region, hit.country].filter(Boolean).join(", ") || "—"}
+                </div>
+              </td>
+              <td className={`${tdClass} text-slate-300`}>
+                <div className="truncate">{hit.deviceType ?? "—"}</div>
+                <div className="truncate text-xs text-slate-500">{hit.platform ?? "—"}</div>
+              </td>
+              <td className={`${tdClass} text-slate-300`}>
+                <div className="truncate">{hit.browser ?? "—"}</div>
+                {hit.userAgent && (
+                  <div
+                    className="truncate text-xs text-slate-500"
+                    title={hit.userAgent}
+                  >
+                    {hit.userAgent}
                   </div>
-                </td>
-                <td className="px-4 py-3 text-slate-300">
-                  <div>{hit.deviceType ?? "—"}</div>
-                  <div className="text-xs text-slate-500">{hit.platform ?? "—"}</div>
-                </td>
-                <td className="px-4 py-3 text-slate-300">
-                  <div>{hit.browser ?? "—"}</div>
-                </td>
-                <td className="px-4 py-3 text-slate-300">
-                  {hit.screenWidth && hit.screenHeight
-                    ? `${hit.screenWidth}x${hit.screenHeight}`
-                    : "—"}
-                </td>
-                <td className="px-4 py-3 text-slate-300">
-                  {hit.language ?? hit.acceptLanguage ?? "—"}
-                </td>
-                <td className="px-4 py-3 max-w-xs break-all text-slate-400">
-                  {hit.referer ?? "—"}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                )}
+              </td>
+              <td className={`${tdClass} whitespace-nowrap text-slate-300`}>
+                {hit.screenWidth && hit.screenHeight
+                  ? `${hit.screenWidth}x${hit.screenHeight}`
+                  : "—"}
+              </td>
+              <td className={`${tdClass} truncate text-slate-300`} title={hit.language ?? hit.acceptLanguage ?? undefined}>
+                {hit.language ?? hit.acceptLanguage ?? "—"}
+              </td>
+              <td className={`${tdClass} truncate text-slate-400`} title={hit.referer ?? undefined}>
+                {hit.referer ?? "—"}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
