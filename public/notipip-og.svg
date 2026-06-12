@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#020617"/>
+  <rect x="80" y="80" width="1040" height="470" rx="32" fill="#0f172a" stroke="#334155"/>
+  <rect x="140" y="140" width="96" height="96" rx="20" fill="#f59e0b"/>
+  <text x="188" y="205" text-anchor="middle" font-family="Arial, sans-serif" font-size="52" font-weight="700" fill="#0f172a">N</text>
+  <text x="270" y="190" font-family="Arial, sans-serif" font-size="56" font-weight="700" fill="#f8fafc">Notipip</text>
+  <text x="270" y="240" font-family="Arial, sans-serif" font-size="28" fill="#94a3b8">Noticias de Ecuador</text>
+  <text x="140" y="360" font-family="Arial, sans-serif" font-size="34" fill="#e2e8f0">Toca para leer la noticia completa</text>
+</svg>

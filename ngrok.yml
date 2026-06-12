@@ -1,0 +1,7 @@
+version: "2"
+region: sa
+tunnels:
+  notipip:
+    proto: http
+    addr: host.docker.internal:3001
+    inspect: true

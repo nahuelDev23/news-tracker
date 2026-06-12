@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String         @id @default(cuid())
+  username      String         @unique
+  passwordHash  String         @map("password_hash")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  redirectLinks RedirectLink[]
+  transfers     Transfer[]
+
+  @@map("users")
+}
+
+model RedirectLink {
+  id          String        @id @default(cuid())
+  slug        String        @unique
+  originalUrl String        @map("original_url")
+  ogTitle     String?       @map("og_title")
+  ogDescription String?     @map("og_description")
+  ogImageUrl  String?       @map("og_image_url")
+  label         String?
+  targetNumber  String        @default("") @map("target_number")
+  userId        String        @map("user_id")
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hits          RedirectHit[]
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  @@map("redirect_links")
+}
+
+model RedirectHit {
+  id                String       @id @default(cuid())
+  redirectLinkId    String       @map("redirect_link_id")
+  redirectLink      RedirectLink @relation(fields: [redirectLinkId], references: [id], onDelete: Cascade)
+  ipAddress         String?      @map("ip_address")
+  internalIp        String?      @map("internal_ip")
+  latitude          Float?
+  longitude         Float?
+  geoSource         String?      @map("geo_source")
+  country           String?
+  region            String?
+  city              String?
+  timezone          String?
+  isp               String?
+  userAgent         String?      @map("user_agent")
+  acceptLanguage    String?      @map("accept_language")
+  acceptEncoding    String?      @map("accept_encoding")
+  referer           String?
+  platform          String?
+  browser           String?
+  deviceType        String?      @map("device_type")
+  screenWidth       Int?         @map("screen_width")
+  screenHeight      Int?         @map("screen_height")
+  language          String?
+  timezoneClient    String?      @map("timezone_client")
+  connectionType    String?      @map("connection_type")
+  createdAt         DateTime     @default(now()) @map("created_at")
+
+  @@index([redirectLinkId])
+  @@index([createdAt])
+  @@map("redirect_hits")
+}
+
+model Transfer {
+  id              String        @id @default(cuid())
+  slug            String        @unique
+  originalName    String        @map("original_name")
+  storedName      String        @map("stored_name")
+  mimeType        String        @map("mime_type")
+  sizeBytes       Int           @map("size_bytes")
+  trackingEnabled Boolean       @default(false) @map("tracking_enabled")
+  label           String?
+  targetNumber    String        @default("") @map("target_number")
+  userId          String?       @map("user_id")
+  user            User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  hits            TransferHit[]
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@map("transfers")
+}
+
+model TransferHit {
+  id             String   @id @default(cuid())
+  transferId     String   @map("transfer_id")
+  transfer       Transfer @relation(fields: [transferId], references: [id], onDelete: Cascade)
+  ipAddress      String?  @map("ip_address")
+  internalIp     String?  @map("internal_ip")
+  latitude       Float?
+  longitude      Float?
+  geoSource      String?  @map("geo_source")
+  country        String?
+  region         String?
+  city           String?
+  timezone       String?
+  isp            String?
+  userAgent      String?  @map("user_agent")
+  acceptLanguage String?  @map("accept_language")
+  acceptEncoding String?  @map("accept_encoding")
+  referer        String?
+  platform       String?
+  browser        String?
+  deviceType     String?  @map("device_type")
+  screenWidth    Int?     @map("screen_width")
+  screenHeight   Int?     @map("screen_height")
+  language       String?
+  timezoneClient String?  @map("timezone_client")
+  connectionType String?  @map("connection_type")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([transferId])
+  @@index([createdAt])
+  @@map("transfer_hits")
+}

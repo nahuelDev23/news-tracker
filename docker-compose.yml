@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: notipip-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: notipip
+      POSTGRES_PASSWORD: notipip
+      POSTGRES_DB: notipip
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U notipip -d notipip"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: notipip-ngrok
+    restart: unless-stopped
+    command:
+      - "start"
+      - "notipip"
+      - "--config"
+      - "/etc/ngrok/ngrok.yml"
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+    ports:
+      - "4040:4040"
+    volumes:
+      - ./ngrok.yml:/etc/ngrok/ngrok.yml:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  postgres_data:
